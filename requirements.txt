@@ -1,0 +1,9 @@
+ultralytics==8.4.54
+torch
+torchvision
+opencv-python
+numpy
+mss
+pyautogui
+stable-baselines3
+gymnasium
