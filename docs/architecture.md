@@ -1,4 +1,4 @@
-System Architecture
+#System Architecture
 1. Overview
 Fate/Grand Order AI Botはゲームが自動化され、YOLOの物体を発見する技術と近接ポリシー最適化（Proximal Policy Optimization - PPO）アルゴリズムが含まれるプロジェクトです。
 システムが設計されたのは画面の観察、関係のある物体の認識と行動を選んで、その行動を通してゲームをコントロールします。
