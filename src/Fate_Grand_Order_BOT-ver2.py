@@ -30,7 +30,7 @@ class fgoevn(gymnasium.Env):
           super().__init__()
           self.action_space=spaces.Discrete(17)
           self.observation_space=spaces.Box(low=0,high=1,shape=(66,),dtype=numpy.float32)
-          self.yolo=YOLO("D:/AI/design/Project/AI/YOLO_AI/FGO-ver8_Best.pt")
+          self.yolo=YOLO("E:/design/Project/AI/YOLO_AI/FGO-ver8_Best.pt")
           self.mss=mss.mss()
           self.enemy_click_count=0
           self.attack_count=0
@@ -67,6 +67,9 @@ class fgoevn(gymnasium.Env):
           self.redcard_candidates=[]
           self.bluecard_candidates=[]
           self.greencard_candidates=[]
+          self.npredcard_candidates=[]
+          self.npbluecard_candidates=[]
+          self.npgreencard_candidates=[]
           self.batte_count=0
           self.skill_click_count=0
           self.select_click_count=0
@@ -86,12 +89,8 @@ class fgoevn(gymnasium.Env):
           self.npredcard_click_count=0
           self.npbluecard_click_count=0
           self.npgreencard_click_count=0
-          yolo_img={"top":fgo_top,
-                    "left":fgo_left,
-                    "width":fgo_width,
-                    "height":fgo_height}
-          yolo_img=numpy.array(self.mss.grab(yolo_img))
-          yolo_img=cv2.cvtColor(yolo_img,cv2.COLOR_BGRA2BGR)
+          yolo_img=android.screenshot(format="opencv")
+          img_height,img_width=yolo_img.shape[:2]
           yolo_results=self.yolo.predict(yolo_img,verbose=False)
           enemy_x=0#0
           enemy_y=0#1
@@ -165,122 +164,122 @@ class fgoevn(gymnasium.Env):
                    yolo_y=float((yolo_y1+yolo_y2)/2)
                    yolo_cls=int(yolo_box.cls[0])
                    if yolo_cls==0:
-                         enemy_x=float(yolo_x/fgo_width)
-                         enemy_y=float(yolo_y/fgo_height)
+                         enemy_x=float(yolo_x/img_width)
+                         enemy_y=float(yolo_y/img_height)
                    elif yolo_cls==1:
-                         enemyhp_x=float(yolo_x/fgo_width)
-                         enemyhp_y=float(yolo_y/fgo_height)
+                         enemyhp_x=float(yolo_x/img_width)
+                         enemyhp_y=float(yolo_y/img_height)
                    elif yolo_cls==2:
-                         enemynp_x=float(yolo_x/fgo_width)
-                         enemynp_y=float(yolo_y/fgo_height)
+                         enemynp_x=float(yolo_x/img_width)
+                         enemynp_y=float(yolo_y/img_height)
                    elif yolo_cls==3:
-                         servant_x=float(yolo_x/fgo_width)
-                         servant_y=float(yolo_y/fgo_height)
+                         servant_x=float(yolo_x/img_width)
+                         servant_y=float(yolo_y/img_height)
                    elif yolo_cls==4:
-                         servanthp_x=float(yolo_x/fgo_width)
-                         servanthp_y=float(yolo_y/fgo_height)
+                         servanthp_x=float(yolo_x/img_width)
+                         servanthp_y=float(yolo_y/img_height)
                    elif yolo_cls==5:
-                         servantnp_x=float(yolo_x/fgo_width)
-                         servantnp_y=float(yolo_y/fgo_height)
+                         servantnp_x=float(yolo_x/img_width)
+                         servantnp_y=float(yolo_y/img_height)
                    elif yolo_cls==6:
-                         servantskill_x=float(yolo_x/fgo_width)
-                         servantskill_y=float(yolo_y/fgo_height)
+                         servantskill_x=float(yolo_x/img_width)
+                         servantskill_y=float(yolo_y/img_height)
                    elif yolo_cls==7:
-                         attack_x=float(yolo_x/fgo_width)
-                         attack_y=float(yolo_y/fgo_height)
+                         attack_x=float(yolo_x/img_width)
+                         attack_y=float(yolo_y/img_height)
                    elif yolo_cls==8:
-                         battle_x=float(yolo_x/fgo_width)
-                         battle_y=float(yolo_y/fgo_height)
+                         battle_x=float(yolo_x/img_width)
+                         battle_y=float(yolo_y/img_height)
                    elif yolo_cls==9:
-                         redcard_x=float(yolo_x/fgo_width)
-                         redcard_y=float(yolo_y/fgo_height)
-                         redcard=(int(redcard_x*fgo_width),int(redcard_y*fgo_height))
+                         redcard_x=float(yolo_x/img_width)
+                         redcard_y=float(yolo_y/img_height)
+                         redcard=(int(redcard_x*img_width),int(redcard_y*img_height))
                          self.redcard.append(redcard)
                          self.redcard_click_count=len(self.redcard)
                    elif yolo_cls==10:
-                         bluecard_x=float(yolo_x/fgo_width)
-                         bluecard_y=float(yolo_y/fgo_height)
-                         bluecard=(int(bluecard_x*fgo_width),int(bluecard_y*fgo_height))
+                         bluecard_x=float(yolo_x/img_width)
+                         bluecard_y=float(yolo_y/img_height)
+                         bluecard=(int(bluecard_x*img_width),int(bluecard_y*img_height))
                          self.bluecard.append(bluecard)
                          self.bluecard_click_count=len(self.bluecard)
                    elif yolo_cls==11:
-                         greencard_x=float(yolo_x/fgo_width)
-                         greencard_y=float(yolo_y/fgo_height)
-                         greencard=(int(greencard_x*fgo_width),int(greencard_y*fgo_height))
+                         greencard_x=float(yolo_x/img_width)
+                         greencard_y=float(yolo_y/img_height)
+                         greencard=(int(greencard_x*img_width),int(greencard_y*img_height))
                          self.greencard.append(greencard)
                          self.greencard_click_count=len(self.greencard)
                    elif yolo_cls==12:
-                         star_x=float(yolo_x/fgo_width)
-                         star_y=float(yolo_y/fgo_height)
+                         star_x=float(yolo_x/img_width)
+                         star_y=float(yolo_y/img_height)
                    elif yolo_cls==13:
-                         starcard_x=float(yolo_x/fgo_width)
-                         starcard_y=float(yolo_y/fgo_height)
+                         starcard_x=float(yolo_x/img_width)
+                         starcard_y=float(yolo_y/img_height)
                    elif yolo_cls==14:
-                         unclescommand_x=float(yolo_x/fgo_width)
-                         unclescommand_y=float(yolo_y/fgo_height)
+                         unclescommand_x=float(yolo_x/img_width)
+                         unclescommand_y=float(yolo_y/img_height)
                    elif yolo_cls==15:
-                         select_x=float(yolo_x/fgo_width)
-                         select_y=float(yolo_y/fgo_height)
+                         select_x=float(yolo_x/img_width)
+                         select_y=float(yolo_y/img_height)
                    elif yolo_cls==16:
-                         selectservant_x=float(yolo_x/fgo_width)
-                         selectservant_y=float(yolo_y/fgo_height)
+                         selectservant_x=float(yolo_x/img_width)
+                         selectservant_y=float(yolo_y/img_height)
                    elif yolo_cls==17:
-                         npredcard_x=float(yolo_x/fgo_width)
-                         npredcard_y=float(yolo_y/fgo_height)
-                         npredcard=(int(npredcard_x*fgo_width),int(npredcard_y*fgo_height))
+                         npredcard_x=float(yolo_x/img_width)
+                         npredcard_y=float(yolo_y/img_height)
+                         npredcard=(int(npredcard_x*img_width),int(npredcard_y*img_height))
                          self.npredcard.append(npredcard)
                          self.npredcard_click_count=len(self.npredcard)
                    elif yolo_cls==18:
-                         npbluecard_x=float(yolo_x/fgo_width)
-                         npbluecard_y=float(yolo_y/fgo_height)
-                         npbluecard=(int(npbluecard_x*fgo_width),int(npbluecard_y*fgo_height))
+                         npbluecard_x=float(yolo_x/img_width)
+                         npbluecard_y=float(yolo_y/img_height)
+                         npbluecard=(int(npbluecard_x*img_width),int(npbluecard_y*img_height))
                          self.npbluecard.append(npbluecard)
                          self.npbluecard_click_count=len(self.npbluecard)
                    elif yolo_cls==19:
-                         npgreencard_x=float(yolo_x/fgo_width)
-                         npgreencard_y=float(yolo_y/fgo_height)
-                         npgreencard=(int(npgreencard_x*fgo_width),int(npgreencard_y*fgo_height))
+                         npgreencard_x=float(yolo_x/img_width)
+                         npgreencard_y=float(yolo_y/img_height)
+                         npgreencard=(int(npgreencard_x*img_width),int(npgreencard_y*img_height))
                          self.npgreencard.append(npgreencard)
                          self.npgreencard_click_count=len(self.npgreencard)
                    elif yolo_cls==20:
-                         continue_x=float(yolo_x/fgo_width)
-                         continue_y=float(yolo_y/fgo_height)
+                         continue_x=float(yolo_x/img_width)
+                         continue_y=float(yolo_y/img_height)
                    elif yolo_cls==21:
-                         participateinthewar_x=float(yolo_x/fgo_width)
-                         participateinthewar_y=float(yolo_y/fgo_height)
+                         participateinthewar_x=float(yolo_x/img_width)
+                         participateinthewar_y=float(yolo_y/img_height)
                    elif yolo_cls==22:
-                         mastershirt_x=float(yolo_x/fgo_width)
-                         mastershirt_y=float(yolo_y/fgo_height)
+                         mastershirt_x=float(yolo_x/img_width)
+                         mastershirt_y=float(yolo_y/img_height)
                    elif yolo_cls==23:
-                         masterskill_x=float(yolo_x/fgo_width)
-                         masterskill_y=float(yolo_y/fgo_height)
+                         masterskill_x=float(yolo_x/img_width)
+                         masterskill_y=float(yolo_y/img_height)
                    elif yolo_cls==24:
-                         borrowservant_x=float(yolo_x/fgo_width)
-                         borrowservant_y=float(yolo_y/fgo_height)
+                         borrowservant_x=float(yolo_x/img_width)
+                         borrowservant_y=float(yolo_y/img_height)
                    elif yolo_cls==25:
-                         thebattlebegins_x=float(yolo_x/fgo_width)
-                         thebattlebegins_y=float(yolo_y/fgo_height)
+                         thebattlebegins_x=float(yolo_x/img_width)
+                         thebattlebegins_y=float(yolo_y/img_height)
                    elif yolo_cls==26:
-                         chooseenergy_x=float(yolo_x/fgo_width)
-                         chooseenergy_y=float(yolo_y/fgo_height)
+                         chooseenergy_x=float(yolo_x/img_width)
+                         chooseenergy_y=float(yolo_y/img_height)
                    elif yolo_cls==27:
-                         selectedskill_x=float(yolo_x/fgo_width)
-                         selectedskill_y=float(yolo_y/fgo_height)
+                         selectedskill_x=float(yolo_x/img_width)
+                         selectedskill_y=float(yolo_y/img_height)
                    elif yolo_cls==28:
-                         theenemyhasbeenchosen_x=float(yolo_x/fgo_width)
-                         theenemyhasbeenchosen_y=float(yolo_y/fgo_height)
+                         theenemyhasbeenchosen_x=float(yolo_x/img_width)
+                         theenemyhasbeenchosen_y=float(yolo_y/img_height)
                    elif yolo_cls==29:
-                         rainbowstone_x=float(yolo_x/fgo_width)
-                         rainbowstone_y=float(yolo_y/fgo_height)
+                         rainbowstone_x=float(yolo_x/img_width)
+                         rainbowstone_y=float(yolo_y/img_height)
                    elif yolo_cls==30:
-                         close_x=float(yolo_x/fgo_width)
-                         close_y=float(yolo_y/fgo_height)
+                         close_x=float(yolo_x/img_width)
+                         close_y=float(yolo_y/img_height)
                    elif yolo_cls==31:
-                         selectedcard_x=float(yolo_x/fgo_width)
-                         selectedcard_y=float(yolo_y/fgo_height)
+                         selectedcard_x=float(yolo_x/img_width)
+                         selectedcard_y=float(yolo_y/img_height)
                    elif yolo_cls==32:
-                         damageservant_x=float(yolo_x/fgo_width)
-                         damageservant_y=float(yolo_y/fgo_height)
+                         damageservant_x=float(yolo_x/img_width)
+                         damageservant_y=float(yolo_y/img_height)
           return numpy.array([enemy_x,enemy_y,
                              enemyhp_x,enemyhp_y,
                              enemynp_x,enemynp_y,
@@ -320,6 +319,13 @@ class fgoevn(gymnasium.Env):
                     target.append((x,y))
      def step(self, action):
           state=self.get_state()
+          if (
+                  state[18] > 0
+                  or state[34] > 0
+                  or state[36] > 0
+                  or state[38] > 0
+):
+            inspect_policy(ppo_model, state)
           red_clicked=False
           blue_clicked=False
           green_clicked=False
@@ -355,13 +361,16 @@ class fgoevn(gymnasium.Env):
                           self.add_unique_cards(self.redcard_candidates,self.redcard)
                           self.add_unique_cards(self.bluecard_candidates,self.bluecard)
                           self.add_unique_cards(self.greencard_candidates,self.greencard)
+                          self.add_unique_cards(self.npredcard_candidates,self.npredcard)
+                          self.add_unique_cards(self.npbluecard_candidates,self.npbluecard)
+                          self.add_unique_cards(self.npgreencard_candidates,self.npgreencard)
                    if self.no_card_fram>=5 and not self.card_locked:
                          self.list_redcard=self.redcard_candidates.copy()
                          self.list_bluecard=self.bluecard_candidates.copy()
                          self.list_greencard=self.greencard_candidates.copy()
-                         self.list_npredcard=self.npredcard.copy()
-                         self.list_npbluecard=self.npbluecard.copy()
-                         self.list_npgreencard=self.npgreencard.copy()
+                         self.list_npredcard=self.npredcard_candidates.copy()
+                         self.list_npbluecard=self.npbluecard_candidates.copy()
+                         self.list_npgreencard=self.npgreencard_candidates.copy()
                          self.redcard.clear()
                          self.bluecard.clear()
                          self.greencard.clear()
@@ -650,6 +659,9 @@ class fgoevn(gymnasium.Env):
            self.redcard_candidates.clear()
            self.bluecard_candidates.clear()
            self.greencard_candidates.clear()
+           self.npredcard_candidates.clear()
+           self.npbluecard_candidates.clear()
+           self.npgreencard_candidates.clear()
            self.redcard_click_count=0
            self.bluecard_click_count=0
            self.greencard_click_count=0
@@ -673,9 +685,59 @@ class fgoevn(gymnasium.Env):
            self.select_click_count=0
            return state,{}
 env=fgoevn()
-ppo_model=PPO.load( "D:/AI/design/Project/AI/PPO_AI/fgo_ppo2_",env)
+ppo_model=PPO.load( "E:/design/Project/AI/PPO_AI/fgo_ppo2_",env=env)
+import torch
+import numpy as np
+
+def inspect_policy(model, obs):
+    obs_tensor = torch.as_tensor(
+        obs,
+        dtype=torch.float32,
+        device=model.device
+    ).unsqueeze(0)
+
+    with torch.no_grad():
+        dist = model.policy.get_distribution(obs_tensor)
+        probs = dist.distribution.probs[0].cpu().numpy()
+
+    action_names = [
+        "Servant Skill",
+        "Select",
+        "Enemy",
+        "Attack",
+        "Red Card",
+        "Blue Card",
+        "Green Card",
+        "Select Servant",
+        "NP Red",
+        "NP Blue",
+        "NP Green",
+        "Continue",
+        "Participate",
+        "Borrow Servant",
+        "Battle Begins",
+        "Choose Energy",
+        "Close"
+    ]
+
+    print("\n========== PPO POLICY ==========")
+
+    for action, prob in enumerate(probs):
+        print(
+            f"{action:2d} | "
+            f"{action_names[action]:18s} | "
+            f"{prob * 100:.6f}%"
+        )
+
+    print("================================")
+    print("Best action:", int(np.argmax(probs)))
+
+    print("YOLO RED:", obs[18] > 0)
+    print("YOLO NP RED:", obs[34] > 0)
+    print("YOLO NP BLUE:", obs[36] > 0)
+    print("YOLO NP GREEN:", obs[38] > 0)
 try:
       ppo_model.learn(total_timesteps=100000000,reset_num_timesteps=False)
 except KeyboardInterrupt:
       print("Trainが止まりました!")
-ppo_model.save("D:/AI/design/Project/AI/PPO_AI/fgo_ppo2_")
+ppo_model.save("E:/design/Project/AI/PPO_AI/fgo_ppo2_")
