@@ -1,5 +1,4 @@
 from zipfile import Path
-
 from gymnasium.spaces import box
 from stable_baselines3 import PPO
 from ultralytics import YOLO
@@ -31,7 +30,7 @@ class fgoevn(gymnasium.Env):
           super().__init__()
           self.action_space=spaces.Discrete(17)
           self.observation_space=spaces.Box(low=0,high=1,shape=(66,),dtype=numpy.float32)
-          self.yolo=YOLO("E:/design/Project/AI/YOLO_AI/FGO-ver8_Best.pt")
+          self.yolo=YOLO("D:/AI/design/Project/AI/YOLO_AI/FGO-ver8_Best.pt")
           self.mss=mss.mss()
           self.enemy_click_count=0
           self.attack_count=0
@@ -321,7 +320,12 @@ class fgoevn(gymnasium.Env):
                     target.append((x,y))
      def step(self, action):
           state=self.get_state()
+          red_clicked=False
           blue_clicked=False
+          green_clicked=False
+          npred_clicked=False
+          npblue_clicked=False
+          npgreen_clicked=False
           enemy=state[0]
           servantskill=state[12]
           select=state[30]
@@ -424,13 +428,9 @@ class fgoevn(gymnasium.Env):
                if state[18]>0 and len(self.list_redcard)>=1:
                          redcard_x,redcard_y=self.list_redcard.pop(0)
                          android.click(redcard_x,redcard_y)
+                         red_clicked=True
                          time.sleep(0.5)
           if action==5:#bluecard
-               print("[BLUE BEFORE]")
-               print("YOLO:", self.bluecard)
-               print("AVAILABLE:", self.list_bluecard)
-               print("LOCKED:", self.card_locked)
-               print("STATE:", state[20], state[21])
                if state[20]>0 and len(self.list_bluecard)>=1:
                          bluecard_x,bluecard_y=self.list_bluecard.pop(0)
                          android.click(bluecard_x,bluecard_y)
@@ -440,6 +440,7 @@ class fgoevn(gymnasium.Env):
                if state[22]>0 and len(self.list_greencard)>=1:
                          greencard_x,greencard_y=self.list_greencard.pop(0)
                          android.click(greencard_x,greencard_y)
+                         green_clicked=True
                          time.sleep(0.5)
           if action==7:#selectservant
                 if state[32]>0:
@@ -449,16 +450,19 @@ class fgoevn(gymnasium.Env):
                    if state[34]>0 and len(self.list_npredcard)>=1:
                                npredcard_x,npredcard_y=self.list_npredcard.pop(0)
                                android.click(npredcard_x,npredcard_y)
+                               npred_clicked=True
                                time.sleep(0.5)
           if action==9:#npbluecard
                    if state[36]>0 and len(self.list_npbluecard)>=1:
                                npbluecard_x,npbluecard_y=self.list_npbluecard.pop(0)
                                android.click(npbluecard_x,npbluecard_y)
+                               npblue_clicked=True
                                time.sleep(0.5)
           if action==10:#npgreencard
                 if state[38]>0 and len(self.list_npgreencard)>=1:
                                npgreencard_x,npgreencard_y=self.list_npgreencard.pop(0)
                                android.click(npgreencard_x,npgreencard_y)
+                               npgreen_clicked=True
                                time.sleep(0.5)
           if action==11:#continue
                 if (state[40]>0 and state[41]>0):
@@ -484,9 +488,6 @@ class fgoevn(gymnasium.Env):
           if action==16:#close
                 if state[60]>0 and not state[30]>0 and not state[32]>0:
                       android.click(int(state[60]*fgo_width),int(state[61]*fgo_height))
-                      print("CLOSE YOLO:",state[60],state[61])
-                      print("CLOSE CLICK:", int(state[60] * fgo_width, int(state[61] * fgo_height)))
-                      print("ANDROID SIZE:",android.window_size())
                       time.sleep(0.5)
           terminated=False
           if state[40]>0:
@@ -528,7 +529,7 @@ class fgoevn(gymnasium.Env):
           if attack>0:
              self.select_click_count=0
           if action==4:
-                   if len(self.list_redcard)>0:
+                   if red_clicked:
                          self.redcard_click_count_step+=1
                          if self.redcard_click_count_step<=self.list_redcard_click_count:
                                reward+=8+(self.skill_click_count/2)
@@ -548,7 +549,7 @@ class fgoevn(gymnasium.Env):
                    else:
                          reward-=3
           if action==6:
-                   if len(self.list_greencard)>0:
+                   if green_clicked:
                          self.greencard_click_count_step+=1
                          if self.greencard_click_count_step<=self.list_greencard_click_count:
                                reward+=5+(self.skill_click_count/2)
@@ -563,7 +564,7 @@ class fgoevn(gymnasium.Env):
                  else:
                         reward-=1
           if action==8:
-                   if len(self.list_npredcard)>0:
+                   if npred_clicked:
                          self.npredcard_click_count_step+=1
                          if self.npredcard_click_count_step<=self.list_npredcard_click_count:
                                reward+=30+(self.skill_click_count/2)
@@ -573,7 +574,7 @@ class fgoevn(gymnasium.Env):
                    else:
                          reward-=10
           if action==9:
-                   if len(self.list_npbluecard)>0:
+                   if npblue_clicked:
                          self.npbluecard_click_count_step+=1
                          if self.npbluecard_click_count_step<=self.list_npbluecard_click_count:
                                reward+=15+(self.skill_click_count/2)
@@ -583,7 +584,7 @@ class fgoevn(gymnasium.Env):
                    else:
                          reward-=7
           if action==10:
-                   if len(self.list_npgreencard)>0:
+                   if npgreen_clicked:
                          self.npgreencard_click_count_step+=1
                          if self.npgreencard_click_count_step<=self.list_npgreencard_click_count:
                                reward+=10+(self.skill_click_count/2)
@@ -594,9 +595,9 @@ class fgoevn(gymnasium.Env):
                          reward-=5
           if action==11:
                    if continue_>0:
-                         reward+=3
+                         reward+=5
                    else:
-                         reward-=1
+                         reward-=5
           if action==12:
                    if participateinthewar>0:
                           reward+=3
@@ -627,8 +628,9 @@ class fgoevn(gymnasium.Env):
                 "next_state_nonzero:",numpy.count_nonzero(next_state))
           return next_state,reward,terminated,False,{}
      def reset(self,seed=None,options=None):
-           self.claer_selectedcard=0
+           super().reset(seed=seed)
            state=self.get_state()
+           self.claer_selectedcard=0
            self.enemy_click_count=0
            self.attack_count=0
            self.batte_count=0
@@ -671,9 +673,9 @@ class fgoevn(gymnasium.Env):
            self.select_click_count=0
            return state,{}
 env=fgoevn()
-ppo_model=PPO.load( "E:/design/Project/AI/PPO_AI/fgo_ppo2_",env)
+ppo_model=PPO.load( "D:/AI/design/Project/AI/PPO_AI/fgo_ppo2_",env)
 try:
       ppo_model.learn(total_timesteps=100000000,reset_num_timesteps=False)
 except KeyboardInterrupt:
       print("Trainが止まりました!")
-ppo_model.save("D:/AI/Python/Project/AI/PPO_AI/fgo_ppo2_")
+ppo_model.save("D:/AI/design/Project/AI/PPO_AI/fgo_ppo2_")
