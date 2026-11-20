@@ -30,6 +30,10 @@ pip install -r requirements.txt
 
 発見についての正解度、行動に対しのポイントの出しることとプレイ中の成功率をのこの以下に書いてあります。
 
+YOLO: updating
+
+PPO: updating
+
 # 将来の改善
 
 ・丈夫に現在のシステムを改善します。  
